@@ -18,7 +18,15 @@ class MapAreas(GameElementBase):
                 mapdatacopy.drop(mapdatacopy.index[ind], inplace=True)
                 self.maparray[maparea.getPositionIndex()]=maparea
         
-                
+    def getRoomID(self,position):
+        key = str(position[0])+"_"+str(position[1])
+        return self.maparray[key].getRoomID()
+    def getRoomName(self,position):
+        key = str(position[0])+"_"+str(position[1])
+        return self.maparray[key].getRoomName()
+    def getRoom(self,position):
+        key = str(position[0])+"_"+str(position[1])
+        return self.maparray[key]
     def getMapData(self):
         return self.mapdata
     def getMapArray(self):
