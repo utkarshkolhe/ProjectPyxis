@@ -14,12 +14,10 @@ class StaticController:
     effectData = pd.read_excel(open('../Data/EffectMap.xlsx', 'rb'))
     @staticmethod
     def displayCD(tag,fillers):
-        print(tag)
         slice1=StaticController.dialogData[StaticController.dialogData["DialogTag"]==tag]
-        print(slice1)
         picker = randrange(slice1.shape[0])
-        print(picker)
         dialog = slice1.iloc[picker]["Dialog"]
+        dialog = dialog.format(**fillers)
         return dialog
     @staticmethod
     def deciepherPostConditions(conditionstr):
@@ -30,10 +28,11 @@ class StaticController:
             return msgs
         for condition in conditions:
             conditiontemp = condition.replace("displayCD", "StaticController.displayCD")
+            conditiontemp = conditiontemp.replace("variableMap", "StaticController.variableMap")
             try:
                 msg = customexec(conditiontemp)
-                print(msg)
-                msgs.append(msg)
+                if type(msg)== type("s"):
+                    msgs.append(msg)
             except:
                 tempflag=False
 
@@ -43,20 +42,15 @@ class StaticController:
     def deciepherPreConditions(conditionstr):
         conditionstr = str(conditionstr)
         conditions = conditionstr.strip().split("\n")
-        print(conditions)
         if len(conditions)==0 or conditions[0]=="nan":
             return True
         flag=True
         for condition in conditions:
             conditiontemp = condition.replace("variableMap", "StaticController.variableMap")
             tempflag = False
-            print("incondition")
             try:
-                
                 tempflag = eval(conditiontemp)
-                print(conditiontemp,tempflag)
             except:
-                print("FAILED",conditiontemp)
                 tempflag=False
             flag = flag and tempflag
         return flag
@@ -72,13 +66,31 @@ class StaticController:
             else:
                 flag = StaticController.deciepherPreConditions(row["Preconditions"])
             flags.append(flag)
-        print(flags)
         slice1 = StaticController.effectData[flags]
-        array_of_msgs = []
+        
+        #Logic for picking from SLICE
+        slice1flags=[]
         for ind,row in slice1.iterrows():
+            show = False
+            if row["MAX_SHOWN"]==-1:
+                show = True
+            elif row["SHOWN"]< row["MAX_SHOWN"]:
+                show=True
             
+            if row["PROBABILTY"] > randrange(100):
+                show = True
+            else:
+                show=False
+            
+            if show:
+                StaticController.effectData.loc[StaticController.effectData["EffectID"]==row["EffectID"],"SHOWN"]= row["SHOWN"]+1
+                #row["SHOWN"]+=1
+            slice1flags.append(show)
+        
+        slice2 = slice1[slice1flags]
+        array_of_msgs = []
+        for ind,row in slice2.iterrows():
             msgs= StaticController.deciepherPostConditions(row["Postconditions"])
-            print(msgs)
             array_of_msgs.append(msgs)
         return array_of_msgs
             

@@ -3,7 +3,7 @@ class MapArea(GameElementBase):
     def __init__(self,position,row_data):
         self.position = position
         self.visitcount=0
-        self.inv=[]
+        self.inv=["gun"]
         self.roomid = row_data["RoomID"]
         self.roomname = row_data["Name"]
         self.description = row_data["Description"]
@@ -19,3 +19,11 @@ class MapArea(GameElementBase):
         return self.visitcount
     def addVisit(self):
         self.visitcount+=1
+    def hasObject(self,objectname):
+        if objectname in self.inv:
+            return True
+        return False
+    def takeObject(self,objectname):
+        self.inv.remove(objectname)
+    def putObject(self,objectname):
+        self.inv.append(objectname)

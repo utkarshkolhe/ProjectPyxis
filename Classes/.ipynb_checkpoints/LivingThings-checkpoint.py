@@ -4,7 +4,7 @@ class LivingThings(GameElementBase):
         self.beingid=beingid
         self.position = position
         self.mapsize=[3,3]
-        self.inventory=[]
+        self.inv=[]
     def move(self,direction):
         flag=False
         if direction=="n":
@@ -33,6 +33,31 @@ class LivingThings(GameElementBase):
         # StaticController.variableMap[self.beingid + "."+"CURRENT_ROOM"] = roomname
         return flag
     def getPosition(self):
-        print(StaticController.test)
+
         return self.position
+        
+    def getRoom(self):
+        from StaticController import StaticController
+        return StaticController.gameMap.getRoom(self.position)
+        
+    def pick(self,objectname):
+        from StaticController import StaticController
+        currentroom = StaticController.gameMap.getRoom(self.position)
+        if currentroom.hasObject(objectname):
+            currentroom.takeObject(objectname)
+            self.inv.append(objectname)
+            return ["SUCCESS"]
+        else:
+            return ["ERROR", "object-not-in-room",{"objectname":objectname,"roomname":currentroom.getRoomName()}]
+    
+    def drop(self,objectname):
+        from StaticController import StaticController
+        currentroom = StaticController.gameMap.getRoom(self.position)
+        if objectname in self.inv:
+            currentroom.putObject(objectname)
+            self.inv.remove(objectname)
+            return ["SUCCESS"]
+        else:
+            return ["ERROR", "object-not-with-user",{"objectname":objectname,"roomname":currentroom.getRoomName()}]
+        
         
