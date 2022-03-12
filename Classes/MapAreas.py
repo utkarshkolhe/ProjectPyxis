@@ -3,9 +3,10 @@ import math
 import random
 from GameElementBase import GameElementBase
 from MapArea import MapArea
+import os.path
 class MapAreas(GameElementBase):
     def __init__(self):
-        self.mapdata = pd.read_excel(open('../Data/MapAreas.xlsx', 'rb'))
+        self.mapdata = pd.read_excel(open(os.path.dirname(__file__)+'/../Data/MapAreas.xlsx', 'rb'))
         num_rows = num_cols= math.ceil(math.sqrt(self.mapdata.shape[0]))
         self.maparray={}
         mapdatacopy=self.mapdata.copy()

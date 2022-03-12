@@ -1,6 +1,7 @@
 from StaticController import StaticController
 from NLPParser import NLPParser
 import pandas as pd
+import os.path
 
 def performAction(message):
     action,parameters = NLPParser.parse(message)
@@ -23,7 +24,7 @@ def performEffect():
             newmsgs.append(["User",msg])
     return newmsgs
 def getInitialCommunication():
-    initialDialog = pd.read_excel(open('../Data/InitialCommunication.xlsx', 'rb'))
+    initialDialog = pd.read_excel(open(os.path.dirname(__file__)+'/../Data/InitialCommunication.xlsx', 'rb'))
     msgs=[]
     for ind, row in initialDialog.iterrows():
         msgs.append([row["Sender"],row["Message"]])
