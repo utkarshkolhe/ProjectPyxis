@@ -1,31 +1,31 @@
 from StaticController import StaticController
-def performAction(action):
-    StaticController.playerCharacter.move(action)
-    
-def conditionCheck(arg1,arg2,condition):
-    if condition =="EQUAL":
-        return arg1 == arg2
-    if condition =="NOTEQUAL":
-        return arg1 != arg2
-    if condition =="GREATERTHAN":
-        return arg1 > arg2
-    
-def deciepherPreConditions(conditionstr):
-    conditions = conditionstr.strip().split("###")
-    if len(conditions)==0:
-        return True
-    if conditions[0]=="EVAL"
-    
-            
-        
-    
-def performEffect():
-    
+from NLPParser import NLPParser
+import pandas as pd
 
-while(True):
-    #Produce Output
-    action = input()
-    performAction(action)
-    #Perform Action
-    #Update ActionConsequences
+def performAction(message):
+    action,parameters = NLPParser.parse(message)
+    if action =="move":
+        StaticController.playerCharacter.move(parameters[0])
+    if action== "pick":
+        StaticController.playerCharacter.pick(parameters[0])
+    if action== "drop":
+        StaticController.playerCharacter.drop(parameters[0])
+def printMsgs(msgs):
+    for msg in msgs:
+        print(msg[0]," : ",msg[1])
+def performEffect():
+    msgs= StaticController.getEffectSlice()
+    newmsgs=[]
+    for arr in msgs:
+        for msg in arr:
+            if len(msg)<1:
+                continue
+            newmsgs.append(["User",msg])
+    return newmsgs
+def getInitialCommunication():
+    initialDialog = pd.read_excel(open('../Data/InitialCommunication.xlsx', 'rb'))
+    msgs=[]
+    for ind, row in initialDialog.iterrows():
+        msgs.append([row["Sender"],row["Message"]])
+    return msgs
     

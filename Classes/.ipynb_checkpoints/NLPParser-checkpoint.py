@@ -20,9 +20,9 @@ class NLPParser:
             #Movements
             if messageparts[0] == "move" or messageparts[0] == "go":
                 if messageparts[1] in ["n","w","s","e"]:
-                    return "move", [messageparts[0]]
+                    return "move", [messageparts[1]]
                 if messageparts[1] in ["north","west","south","east"]:
-                    return "move", [messageparts[0][0]]
+                    return "move", [messageparts[1][0]]
             
             #Pick objects
             if messageparts[0] == "pick" or messageparts[0] == "take":
