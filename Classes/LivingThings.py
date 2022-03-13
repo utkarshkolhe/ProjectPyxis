@@ -1,10 +1,12 @@
 from GameElementBase import GameElementBase
 class LivingThings(GameElementBase):
-    def __init__(self,position,beingid):
+    def __init__(self,position,beingid,name,fullname):
         self.beingid=beingid
         self.position = position
         self.mapsize=[3,3]
         self.inv=[]
+        self.name=name
+        self.fullname = fullname
     def move(self,direction):
         flag=False
         if direction=="n":
@@ -23,11 +25,15 @@ class LivingThings(GameElementBase):
             if self.position[1]<(self.mapsize[1]-1):
                 self.position[1] +=1
                 flag = True
+        
         if flag and self.beingid == "PLAYER":
             from StaticController import StaticController
             StaticController.variableMap["JUST_ENTERED"] = 1
             room = StaticController.gameMap.getRoom(self.position)
             StaticController.variableMap["CURRENT_ROOM"] = room
+        elif self.beingid == "PLAYER":
+            direction_long = {"n":"North","w":"West","s":"South","e":"East"}[direction]
+            return StaticController.displayCD("map-edge",{"direction":direction_long})
         
         # roomname = StaticController.gameMap.getRoomName(self.position)
         # StaticController.variableMap[self.beingid + "."+"CURRENT_ROOM"] = roomname
@@ -46,9 +52,11 @@ class LivingThings(GameElementBase):
         if currentroom.hasObject(objectname):
             currentroom.takeObject(objectname)
             self.inv.append(objectname)
-            return ["SUCCESS"]
+            if self.beingid == "PLAYER":
+                return StaticController.displayCD("object-added-in-inventory",{"objectname":objectname})
         else:
-            return ["ERROR", "object-not-in-room",{"objectname":objectname,"roomname":currentroom.getRoomName()}]
+            if self.beingid == "PLAYER":
+                return StaticController.displayCD("object-not-in-room",{"objectname":objectname})
     
     def drop(self,objectname):
         from StaticController import StaticController
@@ -56,8 +64,32 @@ class LivingThings(GameElementBase):
         if objectname in self.inv:
             currentroom.putObject(objectname)
             self.inv.remove(objectname)
-            return ["SUCCESS"]
+            if self.beingid == "PLAYER":
+                return StaticController.displayCD("object-not-in-room",{"objectname":objectname})
         else:
-            return ["ERROR", "object-not-with-user",{"objectname":objectname,"roomname":currentroom.getRoomName()}]
-        
-        
+            if self.beingid == "PLAYER":
+                return StaticController.displayCD("object-not-with-user",{"objectname":objectname,"roomname":currentroom.getRoomName()})
+    def getInventory(self):
+        if len(self.inv)==0:
+            if self.beingid == "PLAYER":
+                return StaticController.displayCD("user-inventory-empty",{})
+            else:
+                return StaticController.displayCD("npc-inventory-empty",{"npcname":self.name})
+        elif len(self.inv)==1:
+            itemstr = self.inv[0]
+        else:
+            itemstr = ""
+            lenitems=len(self.inv)
+            itemstr += self.inv[0]
+            for i in range(1,lenitems-1):
+                itemstr+= ", " +self.inv[i]
+            itemstr+= " and " +self.inv[lenitems-1]
+        if self.beingid == "PLAYER":
+            return StaticController.displayCD("user-inventory",{"itemstr" : itemstr})
+        else:
+            return StaticController.displayCD("npc-inventory",{"npcname":self.name,"itemstr" : itemstr})
+            
+    def hasObject(self,objectname):
+        if objectname in self.inv:
+            return True
+        return False

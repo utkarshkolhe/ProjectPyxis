@@ -30,11 +30,14 @@ class StaticController:
         for condition in conditions:
             conditiontemp = condition.replace("displayCD", "StaticController.displayCD")
             conditiontemp = conditiontemp.replace("variableMap", "StaticController.variableMap")
+            conditiontemp = conditiontemp.replace("playerCharacter", "StaticController.playerCharacter")
             try:
                 msg = customexec(conditiontemp)
+                print("Passed",conditiontemp)
                 if type(msg)== type("s"):
                     msgs.append(msg)
             except:
+                print("Failed",conditiontemp)
                 tempflag=False
 
         return msgs
@@ -48,6 +51,7 @@ class StaticController:
         flag=True
         for condition in conditions:
             conditiontemp = condition.replace("variableMap", "StaticController.variableMap")
+            conditiontemp = conditiontemp.replace("playerCharacter", "StaticController.playerCharacter")
             tempflag = False
             try:
                 tempflag = eval(conditiontemp)

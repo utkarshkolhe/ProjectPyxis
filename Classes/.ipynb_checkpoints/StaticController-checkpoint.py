@@ -2,6 +2,7 @@ import pandas as pd
 from MapAreas import MapAreas
 from PlayerCharacter import PlayerCharacter
 from random import randrange
+import os.path
 def customexec(code):
     exec('global i; i = %s' % code)
     global i
@@ -10,8 +11,8 @@ class StaticController:
     variableMap={}
     gameMap= MapAreas()
     playerCharacter = PlayerCharacter([2,2])
-    dialogData = pd.read_excel(open('../Data/CommonDialogs.xlsx', 'rb'))
-    effectData = pd.read_excel(open('../Data/EffectMap.xlsx', 'rb'))
+    dialogData = pd.read_excel(open(os.path.dirname(__file__)+'/../Data/CommonDialogs.xlsx', 'rb'))
+    effectData = pd.read_excel(open(os.path.dirname(__file__)+'/../Data/EffectMap.xlsx', 'rb'))
     @staticmethod
     def displayCD(tag,fillers):
         slice1=StaticController.dialogData[StaticController.dialogData["DialogTag"]==tag]
@@ -29,11 +30,14 @@ class StaticController:
         for condition in conditions:
             conditiontemp = condition.replace("displayCD", "StaticController.displayCD")
             conditiontemp = conditiontemp.replace("variableMap", "StaticController.variableMap")
+            conditiontemp = conditiontemp.replace("playerCharacter", "StaticController.playerCharacter")
             try:
                 msg = customexec(conditiontemp)
+                print("Passed",conditiontemp)
                 if type(msg)== type("s"):
                     msgs.append(msg)
             except:
+                print("Failed",conditiontemp)
                 tempflag=False
 
         return msgs
@@ -47,6 +51,7 @@ class StaticController:
         flag=True
         for condition in conditions:
             conditiontemp = condition.replace("variableMap", "StaticController.variableMap")
+            conditiontemp = conditiontemp.replace("playerCharacter", "StaticController.playerCharacter")
             tempflag = False
             try:
                 tempflag = eval(conditiontemp)

@@ -8,7 +8,6 @@ class NLPParser:
                 return "move", [messageparts[0]]
             if messageparts[0] in ["north","west","south","east"]:
                 return "move", [messageparts[0][0]]
-        
             #Exit
             if messageparts[0] == "exit":
                 return "exit", []
@@ -32,6 +31,8 @@ class NLPParser:
             if messageparts[0] == "drop" or messageparts[0] == "throw":
                 return "drop", [messageparts[1]]
             
+            
+        return None
             
             
             
