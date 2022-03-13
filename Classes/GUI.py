@@ -86,8 +86,11 @@ class MainWindow(QtWidgets.QMainWindow):
     
     def __init__(self):
         super(MainWindow,self).__init__()
-        example=['xyz','zzy']
+        self.setMinimumSize(800,1000)
+        
+  
         self.label=QtWidgets.QLabel('Pyxis',self)
+
         l=QtWidgets.QVBoxLayout()
         
         self.input_msg=QtWidgets.QLineEdit("")
