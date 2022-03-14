@@ -4,6 +4,8 @@ class NLPParser:
         messageparts = message.split(" ")
         if len(messageparts)==1:
             #Movements
+            if messageparts[0] =="wait":
+                return None,None
             if messageparts[0] in ["n","w","s","e"]:
                 return "move", [messageparts[0]]
             if messageparts[0] in ["north","west","south","east"]:
@@ -31,7 +33,10 @@ class NLPParser:
             if messageparts[0] == "drop" or messageparts[0] == "throw":
                 return "drop", [messageparts[1]]
             
-            
+        if len(messageparts)==4:
+            if messageparts[0]=="use" and messageparts[2]=="on":
+                return "use",[messageparts[1],messageparts[3]]
+        
         return None,None
             
             

@@ -5,6 +5,7 @@ from PyQt5.QtMultimedia import QMediaPlaylist,QMediaContent,QMediaPlayer
 import GameController as GC
 USER=0
 SYS=1
+import math
 
 BUBBLES={USER:"#a5d6a7",SYS:"#a9a9a9"}
 TRANSLATE_USER={USER:QtCore.QPoint(20, 0),SYS:QtCore.QPoint(0, 0)}
@@ -13,7 +14,7 @@ BUBBLES_PAD=QtCore.QMargins(15,5,35,5)
 TEXT_PAD=QtCore.QMargins(25,15,45,15)
 
             
-def messages(window):
+def printEffects(window):
     msgs = GC.performEffect()
     for msg in msgs:
         window.message_from([msg[1]])
@@ -75,8 +76,10 @@ class Messages(QtCore.QAbstractListModel):
     def add_message(self,who,text):
         if text:
             self.messages.append((who,text))
-            
             self.layoutChanged.emit()
+            sleep_time=math.ceil(len(text)/25)
+            sleep_time*=1
+            QtTest.QTest.qWait(sleep_time)
         
         
 
@@ -86,7 +89,7 @@ class MainWindow(QtWidgets.QMainWindow):
     
     def __init__(self):
         super(MainWindow,self).__init__()
-        self.setMinimumSize(800,1000)
+        self.setMinimumSize(800,600)
         
   
         self.label=QtWidgets.QLabel('Pyxis',self)
@@ -124,13 +127,18 @@ class MainWindow(QtWidgets.QMainWindow):
     def message_to(self):
         self.model.add_message(USER,self.input_msg.text())
         action = self.input_msg.text()
-        GC.performAction(action)
-        messages(self)
+        comms =GC.performAction(action)
+        for comm in comms:
+            window.message_from([comm[1]])
+        printEffects(self)
+        self.messages_entered.scrollToBottom()
     def message_to_initial(self,initial_msg):
         self.model.add_message(USER,initial_msg)
+        self.messages_entered.scrollToBottom()
     def message_from(self,eg):
         for i in eg:
             self.model.add_message(SYS,i)
+        self.messages_entered.scrollToBottom()
             
 
 
@@ -155,8 +163,7 @@ for initial_comm in initial_comms:
         window.message_to_initial(initial_comm[1])
     else:
         window.message_from([initial_comm[1]])
-    QtTest.QTest.qWait(500)
-messages(window)
+printEffects(window)
 
     
 

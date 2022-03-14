@@ -14,8 +14,13 @@ def performAction(message):
             msgs = StaticController.playerCharacter.pick(parameters[0])
         if action== "drop":
             msgs = StaticController.playerCharacter.drop(parameters[0])
-    msgs = parseResponses([[msgs]])
-    printMsgs(msgs)
+        if action == "use":
+            msgs = StaticController.playerCharacter.use(parameters)
+    if type(msgs)==type([]):
+        msgs = parseResponses([msgs])
+    else:
+        msgs = parseResponses([[msgs]])
+    return msgs
 def printMsgs(msgs):
     for msg in msgs:
         print(msg[0]," : ",msg[1])

@@ -1,4 +1,5 @@
 from GameElementBase import GameElementBase
+from random import randrange
 class LivingThings(GameElementBase):
     def __init__(self,position,beingid,name,fullname):
         self.beingid=beingid
@@ -7,6 +8,8 @@ class LivingThings(GameElementBase):
         self.inv=[]
         self.name=name
         self.fullname = fullname
+        self.attributes={}
+        self.attributes["resentment"] = randrange(100)
     def move(self,direction):
         flag=False
         if direction=="n":
@@ -25,9 +28,9 @@ class LivingThings(GameElementBase):
             if self.position[1]<(self.mapsize[1]-1):
                 self.position[1] +=1
                 flag = True
-        
+        from StaticController import StaticController
         if flag and self.beingid == "PLAYER":
-            from StaticController import StaticController
+            
             StaticController.variableMap["JUST_ENTERED"] = 1
             room = StaticController.gameMap.getRoom(self.position)
             StaticController.variableMap["CURRENT_ROOM"] = room
@@ -65,7 +68,7 @@ class LivingThings(GameElementBase):
             currentroom.putObject(objectname)
             self.inv.remove(objectname)
             if self.beingid == "PLAYER":
-                return StaticController.displayCD("object-not-in-room",{"objectname":objectname})
+                return StaticController.displayCD("object-droped-from-inventory",{"objectname":objectname})
         else:
             if self.beingid == "PLAYER":
                 return StaticController.displayCD("object-not-with-user",{"objectname":objectname,"roomname":currentroom.getRoomName()})
@@ -88,8 +91,30 @@ class LivingThings(GameElementBase):
             return StaticController.displayCD("user-inventory",{"itemstr" : itemstr})
         else:
             return StaticController.displayCD("npc-inventory",{"npcname":self.name,"itemstr" : itemstr})
+    def use(self,parameters):
+        from StaticController import StaticController
+        if len(parameters)==2:
+            slice1= StaticController.playerUseCases[(StaticController.playerUseCases["Object1"]==parameters[0])&(StaticController.playerUseCases["Object2"]==parameters[1])]
+            if slice1.shape[0]==0:
+                return StaticController.displayCD("invalid-use2",{"object1" : parameters[0],"object2":parameters[1]})
+            flags=[]
+            for ind,row in slice1.iterrows():
+                flags.append(StaticController.deciepherPreConditions(row["Precondition"]))
+            slice2 = slice1[flags]
+            if slice2.shape[0]==0:
+                return StaticController.displayCD("action-unable-rn",{})            
+            ind = randrange(slice2.shape[0])
+            return StaticController.deciepherPostConditions(slice2.iloc[ind]["Postcondition"])
+                
+    def removeObject(self,objectname):
+        self.inv.remove(objectname)
             
+             
     def hasObject(self,objectname):
         if objectname in self.inv:
             return True
         return False
+    def getAttribute(self,attribute):
+        return self.attributes[attribute]
+    def getName(self):
+        return self.name
